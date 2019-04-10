@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const nodeExternals = require('webpack-node-externals');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const target = process.env.TARGET || 'umd';
 
@@ -29,9 +30,9 @@ const cssLoader = isLocal => ({
   loader: 'css-loader',
   options: {
     modules: true,
-    '-autoprefixer': true,
+    //'-autoprefixer': true,
     importLoaders: true,
-    localIdentName: isLocal ? 'rstcustom__[local]' : null,
+    localIdentName: isLocal ? 'rstcustom__[local]' : '',
   },
 });
 
@@ -47,13 +48,15 @@ const config = {
   plugins: [
     new webpack.EnvironmentPlugin({ NODE_ENV: 'development' }),
     new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-      },
-      mangle: false,
-      beautify: true,
-      comments: true,
+    new UglifyJsPlugin({
+      uglifyOptions: {
+        compress: {
+          warnings: false,
+        },
+        mangle: false,
+        beautify: true,
+        comments: true
+      }
     }),
   ],
   module: {
@@ -131,9 +134,11 @@ switch (target) {
         template: './demo/index.html',
       }),
       new webpack.EnvironmentPlugin({ NODE_ENV: 'production' }),
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false,
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          compress: {
+            warnings: false,
+          }
         },
       }),
     ];
